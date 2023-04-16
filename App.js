@@ -25,6 +25,7 @@ const App = () => {
     setButtonColor('#00AEEF');
     setShowPrompt(true);
     setTitleFontSize(42);
+    setButtonText('Get Recipe');
 
 
 
