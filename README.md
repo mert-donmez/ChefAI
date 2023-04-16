@@ -6,4 +6,4 @@ Whether you're looking for inspiration for tonight's dinner or want to try somet
 ![app](https://user-images.githubusercontent.com/83416622/232274363-94d6da20-e585-49dc-aff7-9b6580753c66.gif) 
 
 
-![bitmap](https://user-images.githubusercontent.com/83416622/232274679-8d1e183a-2390-4f99-a8b5-ddcfc15701a8.png)
+![newss](https://user-images.githubusercontent.com/83416622/232345696-7e94a157-d877-4504-9f87-971cf76dd675.png)
