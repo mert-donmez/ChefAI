@@ -103,7 +103,7 @@ function mainReducer(state, action) {
   }
 }
 
-const Main = ({navigation}) => {
+const Main = () => {
   
   const [state, dispatch] = useReducer(mainReducer, initialState);
   let prompt_lang = ''
@@ -197,7 +197,7 @@ const Main = ({navigation}) => {
   return (
     <View testID="main-view" style={styles.container}>
         <View testID="title-wrapper" style={styles.titleWrapper}>
-            <Title titleFontSize={state.titleFontSize} navigation={navigation}/>
+            <Title titleFontSize={state.titleFontSize}/>
             <View testID="lang-button-container" style={styles.langButtonContainer}>
                 <TouchableOpacity testID="lang-button" onPress={toggleLanguage}>
                     <Text testID="lang-text" style={{fontSize:36}} >{state.language === "english" ? "🇹🇷" : "🇬🇧"}</Text>

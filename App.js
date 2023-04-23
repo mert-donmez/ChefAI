@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet,ScrollView } from 'react-native';
+import React from 'react';
+import { StyleSheet } from 'react-native';
 import Main from './components/Main.js';
 import Menu from './components/Menu.js';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
+
 
 
 const Stack = createNativeStackNavigator();
