@@ -10,6 +10,7 @@ import React, { useReducer } from "react";
 import Loading from "./Loading";
 import Title from "./Title";
 
+
 const initialState = {
   ingredients: "",
   recipe: "",
@@ -22,8 +23,11 @@ const initialState = {
   showPrompt: true,
   showClearButton: false,
   titleFontSize: 42,
+  ingredients_value: ["Chicken,Mushroom,Cream,Spaghetti..."],
+  language: "english",
+  promptText : "What food ingredients do you have?",
+  clearButtonText : 'Clear'
 };
-
 
 function mainReducer(state, action) {
   switch (action.type) {
@@ -40,74 +44,101 @@ function mainReducer(state, action) {
         titleFontSize: 42,
       };
     case "SET_ERROR":
-      return {...state,error: action.newError};
-    case 'CLEAR_ERROR':
-      return {...state,error:''};
-    case 'START_LOADING':
-      return{...state,loading:true};
-    case 'STOP_LOADING':{
-      return {...state,loading:false};
+      return { ...state, error: action.newError };
+    case "CLEAR_ERROR":
+      return { ...state, error: "" };
+    case "START_LOADING":
+      return { ...state, loading: true };
+    case "STOP_LOADING": {
+      return { ...state, loading: false };
     }
-    case 'SET_INGREDIENTS':
+    case "SET_INGREDIENTS":
       return {
         ...state,
-        ingredients:action.newIngredients
-      }
-    case 'START_RECIPE':
-      return{
-        ...state,
-        buttonDisabled:true,
-        buttonColor:'grey',
-        buttonText:action.newButtonText,
-        recipe:'',
-        inputMargin:0,
-        showPrompt:false,
-        titleFontSize:36
-      }
-    case 'DISABLED_BUTTON_FALSE':
+        ingredients: action.newIngredients,
+      };
+    case "START_RECIPE":
       return {
         ...state,
-        buttonDisabled:false
-      }
-    case 'READY_FOR_ANOTHER_RECIPE':
+        buttonDisabled: true,
+        buttonColor: "grey",
+        buttonText: action.newButtonText,
+        recipe: "",
+        inputMargin: 0,
+        showPrompt: false,
+        titleFontSize: 36,
+      };
+    case "DISABLED_BUTTON_FALSE":
       return {
         ...state,
-        buttonText:action.newButtonText,
-        buttonColor:'green'
-      }
-      
-    case 'AFTER_RECIPE_FINISHED':
-      return{
+        buttonDisabled: false,
+      };
+    case "READY_FOR_ANOTHER_RECIPE":
+      return {
         ...state,
-        recipe:action.newRecipe,
-        error:'',
-        showClearButton:true
-      }
+        buttonText: action.newButtonText,
+        buttonColor: "green",
+      };
+
+    case "AFTER_RECIPE_FINISHED":
+      return {
+        ...state,
+        recipe: action.newRecipe,
+        error: "",
+        showClearButton: true,
+      };
+    case "TOGGLE_LANGUAGE":
+      const isEnglish = state.language === "english";
+      return {
+        ...state,
+        language: isEnglish ? "turkish" : "english",
+        buttonText: isEnglish ? "Tarif Al" : "Get Recipe",
+        promptText: isEnglish
+          ? "Hangi yiyecek malzemelerine sahipsin?"
+          : "What food ingredients do you have?",
+        clearButtonText: isEnglish ? "Temizle" : "Clear"
+      };
     default:
       throw new Error();
   }
 }
 
-const Main = () => {
+const Main = ({navigation}) => {
+  
   const [state, dispatch] = useReducer(mainReducer, initialState);
+  let prompt_lang = ''
+  const isEnglishLang = state.language ==='english';
+  if (state.language ==='english'){
+    prompt_lang = `Could you recommend a popular and delicious recipe that can be made with the following ingredients? Ingredients: ${state.ingredients}. Please write the recipe step by step and in detail, indicate the measurements in grams, and the temperature in Celsius. Write the name of the dish and finally, mention the total calories. You don't have to use every ingredient listed.`
+  }else{
+    prompt_lang= `Aşağıdaki malzemelerle yapılabilecek popüler ve lezzetli bir yemek tarifi önerebilir misin? Malzemeler: ${state.ingredients}. Lütfen tarifi adım adım ve detaylı bir şekilde yaz, ölçüleri gram, sıcaklığı Celsius cinsinden belirt ve yemeğin adını yaz. Son olarak, yemeğin kalorisini belirt. Yazılan her malzemeyi kullanmak zorunda değilsin.`
+  }
+
+  const toggleLanguage = () => {
+    dispatch({ type: "TOGGLE_LANGUAGE" });
+  };
 
   const clearButtonFunc = () => {
-    dispatch({type: 'RESTART_SCREEN'});
+    dispatch({ type: "RESTART_SCREEN" });
   };
+
 
   const handleGetRecipe = async () => {
     if (state.ingredients.trim() === "") {
-      dispatch({type:'SET_ERROR',newError:"please enter ingredients."})
+      
+      dispatch({ type: "SET_ERROR", newError: isEnglishLang ? "please enter ingredients." : 'Lutfen malzemeleri girin.' });
       return;
     }
 
     try {
-      dispatch({type:"START_LOADING"});
-      dispatch({type:'START_RECIPE',newButtonText:"Recipe being prepared..."})
-      
+      dispatch({ type: "START_LOADING" });
+      dispatch({
+        type: "START_RECIPE",
+        newButtonText: isEnglishLang? "Recipe being prepared..." : 'Tarif hazirlaniyor...',
+      });
 
-      if (state.error) {
-        dispatch({type:'CLEAR_ERROR'});
+      if (state.error !== '') {
+        dispatch({ type: "CLEAR_ERROR" });
       }
       const response = await fetch("https://api.openai.com/v1/completions", {
         method: "POST",
@@ -117,26 +148,33 @@ const Main = () => {
         },
         body: JSON.stringify({
           model: "text-davinci-003",
-          temperature: 0,
-          prompt: `Here are the food ingredients I have: ${state.ingredients}. Give a recipe that can be made with these ingredients.`,
+          temperature: 0.7,
+          prompt: prompt_lang,
           max_tokens: 1000,
           top_p: 1,
         }),
       });
-      dispatch({type:"STOP_LOADING"});
-      dispatch({type:'DISABLED_BUTTON_FALSE'})
-      
+
+      dispatch({ type: "STOP_LOADING" });
+      dispatch({ type: "DISABLED_BUTTON_FALSE" });
+
       if (state.ingredients !== "") {
-        dispatch({type:'READY_FOR_ANOTHER_RECIPE',newButtonText:'Find Another Recipe'});
+        dispatch({
+          type: "READY_FOR_ANOTHER_RECIPE",
+          newButtonText: isEnglishLang ? "Find Another Recipe" : "Baska Tarif Bul",
+        });
       }
       const data = await response.json();
       const recipeText = data.choices[0].text;
       const formattedRecipe = formatRecipe(recipeText);
 
-      dispatch({type:'AFTER_RECIPE_FINISHED',newRecipe:formattedRecipe})
+      dispatch({ type: "AFTER_RECIPE_FINISHED", newRecipe: formattedRecipe });
     } catch (error) {
       console.error(error);
-      dispatch({type:'SET_ERROR',newError:'An error occurred while getting the recipe.'})
+      dispatch({
+        type: "SET_ERROR",
+        newError: isEnglishLang? "An error occurred while getting the recipe." : "Tarif hazirlanirken bir hata olustu.",
+      });
     }
   };
 
@@ -144,8 +182,8 @@ const Main = () => {
     const recipeLines = recipeText.split("\n");
     const recipeName = recipeLines[0].trim();
     const ingredients = recipeLines.slice(1, recipeLines.length - 1).join("\n");
-    const instructions = recipeLines[recipeLines.length - 1];
-
+    const instructions = recipeLines[recipeLines.length - 1].split(": ")[1];
+  
     return (
       <View>
         <Text style={styles.recipeName}>{recipeName}</Text>
@@ -154,65 +192,84 @@ const Main = () => {
       </View>
     );
   };
+  
+
   return (
-    <View style={styles.container}>
-      <Title titleFontSize={state.titleFontSize} />
-      <ScrollView>
-        <View style={[styles.inputContainer, { marginTop: state.inputMargin }]}>
-          {state.showPrompt && (
-            <Text style={styles.promptTextStyle}>
-              {" "}
-              What food ingredients do you have?
-            </Text>
-          )}
-          <TextInput
-            style={styles.input}
-            placeholder="Chicken,mushroom,spaghetti..."
-            value={state.ingredients}
-            onChangeText={(text) => dispatch({type:'SET_INGREDIENTS',newIngredients:text})}
-          />
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: state.buttonColor }]}
-            onPress={handleGetRecipe}
-            disabled={state.buttonDisabled}
-          >
-            <Text style={styles.buttonText}>{state.buttonText}</Text>
-          </TouchableOpacity>
-          {state.showClearButton && (
-            <TouchableOpacity
-              style={[styles.clearButton, { backgroundColor: "red" }]}
-              onPress={clearButtonFunc}
-            >
-              <Text style={styles.buttonText}>Clear</Text>
-            </TouchableOpacity>
-          )}
+    <View testID="main-view" style={styles.container}>
+        <View testID="title-wrapper" style={styles.titleWrapper}>
+            <Title titleFontSize={state.titleFontSize} navigation={navigation}/>
+            <View testID="lang-button-container" style={styles.langButtonContainer}>
+                <TouchableOpacity testID="lang-button" onPress={toggleLanguage}>
+                    <Text testID="lang-text" style={{fontSize:36}} >{state.language === "english" ? "🇹🇷" : "🇬🇧"}</Text>
+                </TouchableOpacity>
+            </View>
         </View>
-
-        {state.error !== "" && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{state.error}</Text>
-          </View>
-        )}
-
-        {state.loading && <Loading />}
-        {state.recipe !== "" && (
-          <View style={styles.resultContainer}>
-            <Text style={{ fontSize: 18 }}>Your recipe is ready:</Text>
-            <Text style={styles.resultText}>{state.recipe}</Text>
-          </View>
-        )}
-      </ScrollView>
+        <ScrollView testID="scroll-view">
+            <View testID="input-container" style={[styles.inputContainer, { marginTop: state.inputMargin }]}>
+                {state.showPrompt && (
+                    <Text testID="prompt-text" style={styles.promptTextStyle}>{state.promptText}</Text>
+                )}
+                <TextInput
+                    testID="ingredient-input"
+                    style={styles.input}
+                    placeholder={
+                        state.ingredients_value[
+                            (Math.random() * state.ingredients_value.length) | 0
+                        ]
+                    }
+                    value={state.ingredients}
+                    onChangeText={(text) => {
+                      dispatch({ type: "SET_INGREDIENTS", newIngredients: text });
+                      dispatch({ type: "CLEAR_ERROR" });
+                    }}
+                    
+                />
+                <TouchableOpacity
+                    testID="submit-button"
+                    style={[styles.button, { backgroundColor: state.buttonColor }]}
+                    onPress={handleGetRecipe}
+                    disabled={state.buttonDisabled}
+                >
+                    <Text style={styles.buttonText}>{state.buttonText}</Text>
+                </TouchableOpacity>
+                {state.showClearButton && (
+                    <TouchableOpacity
+                        testID="clear-button"
+                        style={[styles.clearButton, { backgroundColor: "red" }]}
+                        onPress={clearButtonFunc}
+                    >
+                        <Text style={styles.buttonText}>{state.clearButtonText}</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
+            {state.error !== "" && (
+                <View testID="error-container" style={styles.errorContainer}>
+                    <Text testID="error-text" style={styles.errorText}>{state.error}</Text>
+                </View>
+            )}
+            {state.loading && <Loading testID="loading-component"/>}
+            {state.recipe !== "" && (
+                <View testID="recipe-container" style={styles.resultContainer}>
+                    <Text testID="recipe-results" style={styles.resultText}>{state.recipe}</Text>
+                </View>
+            )}
+        </ScrollView>
     </View>
-  );
-};
+);
 
-export default Main;
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
     paddingVertical: "20%",
+  },
+  langButtonContainer: {
+    alignItems: "flex-end",
+    marginHorizontal:16,
+    flexDirection:'row'
+
   },
   inputContainer: {
     backgroundColor: "white",
@@ -277,4 +334,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "400",
   },
+  titleWrapper:{
+    flexDirection:'row',
+    justifyContent:'space-between',
+  }
 });
+
+export default Main;

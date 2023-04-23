@@ -5,17 +5,12 @@ import { useNavigation } from '@react-navigation/native';
 
 
 const Title = ({titleFontSize}) => {
-    const navigation = useNavigation();
   return (
     <View style={styles.titleWrapper}>
-        <View>
           <Text style={{fontSize:titleFontSize}}>
             ChefAI
           </Text>
-          </View>
-          <TouchableOpacity onPress={() => navigation.navigate('Menu')}>
-          <Image source={require('../assets/menuIcon.png')} style={styles.menuIcon}/>
-          </TouchableOpacity>
+          
     </View>
   )
 }
@@ -27,8 +22,8 @@ const styles = StyleSheet.create({
         marginTop:16,
         marginHorizontal:16,
         flexDirection:'row',
-        justifyContent:'space-between',
-        alignItems:'center'
+        alignItems:'center',
+        justifyContent:'space-between'
     },
     menuIcon:{
         width:30,

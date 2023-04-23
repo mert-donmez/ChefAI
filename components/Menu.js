@@ -28,7 +28,7 @@ const Menu = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [language,Setlanguage] = useState('Language');
   const [backButtonText,setBackButtonText]= useState('Back');
-  const [themeText,setThemeText] = useState('Theme')
+  const [themeText,setThemeText] = useState('Theme');
   const [isDarkTheme,setIsDarkTheme]= useState(false);
   const [backGroundColor,setBackGroundColor] = useState(themeColors.background.light);
   const [textColor,setTextColor] = useState(themeColors.text.light);
@@ -66,17 +66,13 @@ const Menu = () => {
 
 
   return (
-    <SafeAreaView style={[styles.container,{backgroundColor: backGroundColor}]}>
+    <View style={[styles.container,{backgroundColor: backGroundColor}]}>
       <View style={styles.titleWrapper}>
         <TouchableOpacity onPress={() => navigation.navigate('Main')} style={styles.titles}>
-
         {
         isDarkTheme ? <Image source={require('../assets/backIconLight.png')} style={styles.backIcon} /> : 
         <Image source={require('../assets/backIconDark.png')} style={styles.backIcon} />
-    
         }
-
-          
           <Text style={[styles.titleText,{color:textColor}]}>{backButtonText}</Text>
         </TouchableOpacity>
       </View>
@@ -119,7 +115,7 @@ const Menu = () => {
 
         
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -130,15 +126,15 @@ const styles = StyleSheet.create({
   },
   titleWrapper: {
     marginHorizontal: 8,
-    marginTop: 32,
+    marginTop: 64,
     
   },
   titleText: {
-    fontSize: 36,
+    fontSize: 24,
   },
   backIcon: {
-    width: 30,
-    height: 30,
+    width: 24,
+    height: 24,
   },
   backIconWhite:{
     width:30,
