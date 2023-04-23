@@ -132,21 +132,21 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   resultContainer: {
-    backgroundColor: "grey",
+    backgroundColor: "white",
     borderRadius: 20,
     marginTop: 16,
     marginHorizontal: "5%",
     
   },
   resultTextWrapper: {
-    paddingHorizontal: 8, // Ekranda metnin kenarları için biraz boşluk sağlar
+    paddingHorizontal: 8, 
   },
 
   resultText: {
     color: "#333333",
     fontSize: 20,
     fontWeight: "bold",
-    textAlign: "justify", // Metnin düzgün hizalanmasını sağlamak için bu satırı ekleyin
+    textAlign: "justify", 
   },
   errorContainer: {
     backgroundColor: "white",
